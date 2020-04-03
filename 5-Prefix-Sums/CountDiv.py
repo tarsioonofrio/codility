@@ -65,6 +65,7 @@ def main():
     k = 2
     t = solution(a, b, k)
     print(a, b, k, t)
+    print("%d\t%d\t%d\t%d\t%d\t%s" % (a, b, k, t, 3, t == 3))
 
     ca = [0, 20]
     cb = [0, 20]
