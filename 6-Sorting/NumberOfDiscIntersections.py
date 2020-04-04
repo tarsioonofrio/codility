@@ -1,51 +1,6 @@
 import random
 from collections import defaultdict
 
-def binary_search_interactive(arr, ln, r, x):
-    while ln <= r:
-
-        mid = ln + (r - ln) // 2;
-
-        # Check if x is present at mid
-        if arr[mid] == x:
-            return mid
-
-            # If x is greater, ignore left half
-        elif arr[mid] < x:
-            ln = mid + 1
-
-        # If x is smaller, ignore right half
-        else:
-            r = mid - 1
-
-    # If we reach here, then the element
-    # was not present
-    return -1
-
-
-def binary_search_recursive(arr, ln, r, x):
-    # Check base case
-    if r >= ln:
-
-        mid = ln + (r - ln) // 2
-
-        # If element is present at the middle itself
-        if arr[mid] == x:
-            return mid
-
-            # If element is smaller than mid, then it
-        # can only be present in left subarray
-        elif arr[mid] > x:
-            return binary_search_recursive(arr, ln, mid - 1, x)
-
-            # Else the element can only be present
-        # in right subarray
-        else:
-            return binary_search_recursive(arr, mid + 1, r, x)
-
-    else:
-        # Element is not present in the array
-        return -1
 
 def solution(arr):
     m = [1, -1]
@@ -61,39 +16,64 @@ def solution(arr):
             value = a
             index = e
 
+
+
+def binary_search_recursive(d, max_value, max_index, count=0):
+    # Check base case
+    if len(d) > 0:
+        din = defaultdict(lambda: set())
+        setin = set()
+        dout = defaultdict(lambda: set())
+        max_value_in, max_index_in = -1, -1
+        max_value_out, max_index_out = -1, -1
+        for v, i in d.items():
+            if max_index in i:
+                continue
+            if max_index - max_value <= v <= max_index + max_value:
+                din[v] = i
+                setin.update(i)
+                for ii in i:
+                    vv = abs(ii - v)
+                    if vv > max_value_in:
+                        max_value_in = vv
+                        max_index_in = ii
+            else:
+                if i.issubset(setin) is False:
+                    dout[v] = i
+                    for ii in i:
+                        vv = abs(ii - v)
+                        if vv > max_value_out:
+                            max_value_out = vv
+                            max_index_out = ii
+
+        # If element is present at the middle itself
+        print(len(setin))
+        if len(din) + len(dout) == 0:
+            return len(setin)
+
+        else:
+            cin = binary_search_recursive(din, max_value_in, max_index_in, len(setin))
+            cout = binary_search_recursive(dout, max_value_out, max_index_out, 0)
+            return cin + cout
+
+    else:
+        # Element is not present in the array
+        return count
+
+
 def solution(arr):
     d = defaultdict(lambda: set())
-    value, index = -1, -1
-    for k, v in enumerate(arr):
-        k0 = k - v
-        k1 = k + v
-        d[k0].add(k)
-        d[k1].add(k)
-        if v > value:
-            value = v
-            index = k
-
-    din = defaultdict(lambda: set())
-    setin = set()
-    dout = defaultdict(lambda: set())
-    value1, index1 = -1, -1
-    for k, v in d.items():
-        if index in v:
-            continue
-        if index - value <= k <= index + value:
-            din[k] = v
-            setin.update(v)
-            #for v1 in v:
-            #    if v1 > value1:
-            #        value1 = v1
-            #        index1 = k
-        else:
-            dout[k] = v
-            #print(v, index, value)
-            #if v.issubset(setin) is False and k != index:
-
-
-    return 0
+    max_value, max_index = -1, -1
+    for i, v in enumerate(arr):
+        k0 = i - v
+        k1 = i + v
+        d[k0].add(i)
+        d[k1].add(i)
+        if v > max_value:
+            max_value = v
+            max_index = i
+    c = binary_search_recursive(d, max_value, max_index, 0)
+    return c
 
 
 def test_correctness(f, a, n):
@@ -120,6 +100,7 @@ def main():
     print(arr)
     print("%d\t%d\t%s" % (t, 11, t == 11))
 
+def test():
     ca = [0, 20]
     cn = [0, 20]
     for r in range(10):
