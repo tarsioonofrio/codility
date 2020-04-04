@@ -3,65 +3,55 @@ from collections import defaultdict
 
 
 def solution(arr):
-    m = [1, -1]
-    # d = {e-i*n: [e] for e, i in enumerate(a) for n in m}
-    d = defaultdict(lambda: defaultdict(lambda: []))
-    value, index = -1, -1
-    for e, a in enumerate(arr):
-        k0 = e - a
-        k1 = e + a
-        d[k0][0].append(e)
-        d[k1][1].append(e)
-        if a > value:
-            value = a
-            index = e
 
-
-
-def binary_search_recursive(d, max_value, max_index, count=0):
-    # Check base case
-    if len(d) > 0:
-        din = defaultdict(lambda: set())
-        setin = set()
-        dout = defaultdict(lambda: set())
-        max_value_in, max_index_in = -1, -1
-        max_value_out, max_index_out = -1, -1
-        for v, i in d.items():
-            if max_index in i:
-                continue
-            if max_index - max_value <= v <= max_index + max_value:
-                din[v] = i
-                setin.update(i)
-                for ii in i:
-                    vv = abs(ii - v)
-                    if vv > max_value_in:
-                        max_value_in = vv
-                        max_index_in = ii
-            else:
-                if i.issubset(setin) is False:
-                    dout[v] = i
+    def binary_search_recursive(d, max_value, max_index, count=0):
+        # Check base case
+        if len(d) > 0:
+            din = defaultdict(lambda: set())
+            setin = set()
+            dout = defaultdict(lambda: set())
+            max_value_in, max_index_in = -1, -1
+            max_value_out, max_index_out = -1, -1
+            for v, i in d.items():
+                if max_index in i:
+                    continue
+                if max_index - max_value <= v <= max_index + max_value:
+                    din[v] = i
+                    setin.update(i)
                     for ii in i:
                         vv = abs(ii - v)
+                        if vv > max_value_in:
+                            max_value_in = vv
+                            max_index_in = ii
+                else:
+                    for ii in i:
+                        vv = abs(ii - v)
+                        if max_index - max_value <= ii + vv <= max_index + max_value:
+                            continue
+                        if max_index - max_value <= ii - vv <= max_index + max_value:
+                            continue
+                        dout[v].add(ii)
                         if vv > max_value_out:
                             max_value_out = vv
                             max_index_out = ii
 
-        # If element is present at the middle itself
-        print(len(setin))
-        if len(din) + len(dout) == 0:
-            return len(setin)
+
+            if len(din) + len(dout) == 0:
+                return count
+
+            else:
+                new_count = len(setin)
+                cin = binary_search_recursive(din, max_value_in, max_index_in, new_count)
+                cout = binary_search_recursive(dout, max_value_out, max_index_out, new_count)
+                print("**", max_index, max_value)
+                print(din)
+                print(dout)
+                print(cin, cout)
+                return cin + cout
 
         else:
-            cin = binary_search_recursive(din, max_value_in, max_index_in, len(setin))
-            cout = binary_search_recursive(dout, max_value_out, max_index_out, 0)
-            return cin + cout
+            return count
 
-    else:
-        # Element is not present in the array
-        return count
-
-
-def solution(arr):
     d = defaultdict(lambda: set())
     max_value, max_index = -1, -1
     for i, v in enumerate(arr):
@@ -89,16 +79,17 @@ def test_performance(f, a, n):
 
 
 def main():
-    arr = [0] * 6
+    arr = [0] * 7
     arr[0] = 1
-    arr[1] = 5
+    arr[1] = 6
     arr[2] = 2
     arr[3] = 1
     arr[4] = 4
     arr[5] = 0
     t = solution(arr)
     print(arr)
-    print("%d\t%d\t%s" % (t, 11, t == 11))
+    print("%d\t%d\t%s" % (t, 12, t == 12))
+
 
 def test():
     ca = [0, 20]
