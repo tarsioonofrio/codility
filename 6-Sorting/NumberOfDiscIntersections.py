@@ -1,68 +1,91 @@
 import random
 from collections import defaultdict
-
+from math import inf
 
 def solution(arr):
 
-    def binary_search_recursive(d, max_value, max_index, count=0):
+    def binary_search_recursive(d, best_value, best_index, min_value, max_value, count=0):
         # Check base case
         if len(d) > 0:
             din = defaultdict(lambda: set())
             setin = set()
+            setout = set()
             dout = defaultdict(lambda: set())
-            max_value_in, max_index_in = -1, -1
-            max_value_out, max_index_out = -1, -1
+            best_value_in, best_index_in = -1, -1
+            best_value_out, best_index_out = -1, -1
+            min_value_in, max_value_in = inf, -1
+            min_value_out, max_value_out = inf, -1
             for v, i in d.items():
-                if max_index in i:
-                    continue
-                if max_index - max_value <= v <= max_index + max_value:
+                if min_value <= v <= max_value:
                     din[v] = i
+                    if v < min_value_in:
+                        min_value_in = v
+                    if v > max_value_in:
+                        max_value_in = v
+
+                    if best_index in i:
+                        continue
                     setin.update(i)
-                    for ii in i:
-                        vv = abs(ii - v)
-                        if vv > max_value_in:
-                            max_value_in = vv
-                            max_index_in = ii
+
+                    if best_index - best_value <= v <= best_index + best_value:
+                        for ii in i:
+                            vv = abs(ii - v)
+                            if vv > best_value_in and best_index != ii:
+                                best_value_in = vv
+                                best_index_in = ii
+
                 else:
                     for ii in i:
                         vv = abs(ii - v)
-                        if max_index - max_value <= ii + vv <= max_index + max_value:
+                        if min_value <= ii + vv <= max_value:
                             continue
-                        if max_index - max_value <= ii - vv <= max_index + max_value:
+                        if min_value <= ii - vv <= max_value:
                             continue
+                        if v < min_value_out:
+                            min_value_out = v
+                        if v > max_value_out:
+                            max_value_out = v
                         dout[v].add(ii)
-                        if vv > max_value_out:
-                            max_value_out = vv
-                            max_index_out = ii
+                        setout.update(i)
+                        if vv > best_value_out:
+                            best_value_out = vv
+                            best_index_out = ii
 
+            new_count = len(setin)
 
-            if len(din) + len(dout) == 0:
-                return count
+            if len(setin) + len(dout) == 0:
+                return 0
 
             else:
-                new_count = len(setin)
-                cin = binary_search_recursive(din, max_value_in, max_index_in, new_count)
-                cout = binary_search_recursive(dout, max_value_out, max_index_out, new_count)
-                print("**", max_index, max_value)
+                cin = binary_search_recursive(din, best_value_in, best_index_in, min_value_in, max_value_in, new_count)
+                cout = binary_search_recursive(dout, best_value_out, best_index_out, min_value_out, max_value_out, new_count)
+                print("*", best_index)
+                print(new_count)
                 print(din)
                 print(dout)
-                print(cin, cout)
                 return cin + cout
 
         else:
             return count
 
     d = defaultdict(lambda: set())
-    max_value, max_index = -1, -1
+    best_value, best_index = -1, -1
+    min_value, max_value = inf, -1
     for i, v in enumerate(arr):
         k0 = i - v
         k1 = i + v
         d[k0].add(i)
         d[k1].add(i)
-        if v > max_value:
-            max_value = v
-            max_index = i
-    c = binary_search_recursive(d, max_value, max_index, 0)
+        if v > best_value:
+            best_value = v
+            best_index = i
+        if k0 < min_value:
+            min_value = k0
+        if k1 > max_value:
+            max_value = k1
+
+
+    c = binary_search_recursive(d, best_value, best_index, min_value, max_value, 0)
     return c
 
 
@@ -79,9 +102,9 @@ def test_performance(f, a, n):
 
 
 def main():
-    arr = [0] * 7
+    arr = [0] * 6
     arr[0] = 1
-    arr[1] = 6
+    arr[1] = 4
     arr[2] = 2
     arr[3] = 1
     arr[4] = 4
