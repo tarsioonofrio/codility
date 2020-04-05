@@ -6,7 +6,6 @@ def solution(size, direction):
         return 1
     size = deque(size)
     direction = deque(direction)
-    stack = deque()
     i = 0
     while True:
         if i == len(size) - 1:
@@ -23,14 +22,10 @@ def solution(size, direction):
                 del size[i]
                 del direction[i]
                 i -= 1
-        #elif d[0] == d[1]:
-        #    i += 1
         else:
             i += 1
 
-    print(size)
     return len(size)
-
 
 
 size = [0] * 5
