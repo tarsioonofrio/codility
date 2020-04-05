@@ -1,5 +1,6 @@
 from collections import deque
 
+
 def solution(string):
     if len(string) == 0:
         return 1
